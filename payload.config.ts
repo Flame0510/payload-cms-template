@@ -1,11 +1,24 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+const dbAdapter = process.env.DATABASE_URI
+  ? postgresAdapter({
+      pool: { connectionString: process.env.DATABASE_URI },
+      push: false,
+      migrationDir: 'migrations',
+    })
+  : sqliteAdapter({
+      client: {
+        url: process.env.SQLITE_URI || 'file:./database.sqlite',
+      },
+    })
 
 export default buildConfig({
   admin: {
@@ -29,9 +42,5 @@ export default buildConfig({
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET!,
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
-  db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URI! },
-    push: false,
-    migrationDir: 'migrations',
-  }),
+  db: dbAdapter,
 })
