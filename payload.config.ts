@@ -13,6 +13,7 @@ const dbAdapter = process.env.DATABASE_URI
       pool: { connectionString: process.env.DATABASE_URI },
       push: false,
       migrationDir: 'migrations',
+      disableCreateDatabase: true,
     })
   : sqliteAdapter({
       client: {
