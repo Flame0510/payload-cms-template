@@ -7,6 +7,23 @@ import { fileURLToPath } from 'url'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Parse connection string and add SSL options separately
+const getDbConfig = () => {
+  const connectionString = process.env.DATABASE_URI
+  if (!connectionString) return { connectionString: '', max: 1 }
+
+  return {
+    connectionString,
+    max: 1,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 15000,
+    // Force SSL with self-signed cert support for Supabase
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  }
+}
+
 export default buildConfig({
   admin: {
     user: 'users',
@@ -30,13 +47,7 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || 'fallback-secret-key',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URI,
-      max: 1,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-    },
+    pool: getDbConfig(),
     push: false,
   }),
 })
