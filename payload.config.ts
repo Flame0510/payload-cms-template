@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Use Postgres if DATABASE_URI is available, otherwise fall back to SQLite
 const dbAdapter = process.env.DATABASE_URI
   ? postgresAdapter({
       pool: { connectionString: process.env.DATABASE_URI },
@@ -17,7 +18,7 @@ const dbAdapter = process.env.DATABASE_URI
     })
   : sqliteAdapter({
       client: {
-        url: process.env.SQLITE_URI || 'file:./database.sqlite',
+        url: 'file:./database.sqlite',
       },
     })
 
