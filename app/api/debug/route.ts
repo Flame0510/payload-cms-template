@@ -21,9 +21,9 @@ export async function GET() {
     })
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
-    const cause = (err as any)?.cause
+    const cause = (err as { cause?: unknown })?.cause
     const causeMsg = cause instanceof Error ? cause.message : String(cause || 'none')
-    const causeCode = (cause as any)?.code || 'none'
+    const causeCode = (cause as { code?: string })?.code || 'none'
     return NextResponse.json({ 
       ok: false, 
       error: msg, 
@@ -52,7 +52,7 @@ async function testDirectConnection() {
     return { ok: true, db: res.rows[0].db }
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e)
-    const code = (e as any)?.code || 'none'
+    const code = (e as { code?: string })?.code || 'none'
     try { await pool.end() } catch {}
     return { ok: false, error: msg, code }
   }
