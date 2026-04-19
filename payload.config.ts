@@ -14,7 +14,7 @@ const getDbConfig = () => {
 
   return {
     connectionString,
-    max: 1,
+    max: 3,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 15000,
     // Force SSL with self-signed cert support for Supabase
